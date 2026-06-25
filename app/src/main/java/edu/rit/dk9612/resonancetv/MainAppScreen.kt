@@ -20,6 +20,7 @@ fun MainAppScreen(
 ) {
     var currentScreen by remember { mutableStateOf("Home") }
     var selectedVideo by remember { mutableStateOf<VideoItem?>(null) }
+    var isPlayerOpen by remember { mutableStateOf(false) }
 
     // 1. Observe the database! Whenever Room updates, this list updates automatically.
     val savedVideosEntities by sanctuaryViewModel.savedVideos.observeAsState(emptyList())
@@ -29,7 +30,13 @@ fun MainAppScreen(
         VideoItem(entity.id, entity.title, entity.subtitle, entity.duration)
     }
 
-    if (selectedVideo != null) {
+    // THE FIX: Check if the player should be open first!
+    if (isPlayerOpen && selectedVideo != null) {
+        PlayerScreen(
+            video = selectedVideo!!,
+            onNavigateBack = { isPlayerOpen = false } // Closes player, goes back to details
+        )
+    } else if (selectedVideo != null) {
         // Check if the current video's ID is in our database list
         val isSaved = sanctuaryList.any { it.id == selectedVideo!!.id }
 
@@ -44,7 +51,8 @@ fun MainAppScreen(
                 } else {
                     sanctuaryViewModel.addVideo(video)
                 }
-            }
+            },
+            onPlayClicked = { isPlayerOpen = true } // THIS FIXES YOUR COMPILER ERROR!
         )
     } else {
         NavigationDrawer(

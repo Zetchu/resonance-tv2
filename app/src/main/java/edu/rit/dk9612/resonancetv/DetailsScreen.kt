@@ -19,27 +19,28 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
+import coil.compose.AsyncImage
 
 @Composable
 fun DetailsScreen(
     video: VideoItem,
     isSaved: Boolean,
     onNavigateBack: () -> Unit,
-    onToggleSave: (VideoItem) -> Unit
+    onToggleSave: (VideoItem) -> Unit,
+    onPlayClicked: () -> Unit // 1. ADDED THIS PARAMETER
 ) {
-    // Intercepts the physical "Back" button on the TV remote
     BackHandler(onBack = onNavigateBack)
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 1. Immersive Background Layer
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF1A1A1A))
+        AsyncImage(
+            model = video.thumbnailUrl,
+            contentDescription = "${video.title} Background",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
 
-        // 2. Gradient Overlay
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -56,7 +57,6 @@ fun DetailsScreen(
                 )
         )
 
-        // 3. On-Screen Back Button (Top Left)
         IconButton(
             onClick = onNavigateBack,
             modifier = Modifier
@@ -74,17 +74,16 @@ fun DetailsScreen(
             )
         }
 
-        // 4. Content Layer (Text and Buttons)
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.5f) // Content only takes up the left half of the screen
-                .padding(start = 56.dp, top = 56.dp, bottom = 32.dp, end = 32.dp) // Reduced bottom padding slightly
-                .verticalScroll(rememberScrollState()), // ADD THIS LINE!
+                .fillMaxWidth(0.8f)
+                .padding(start = 56.dp, top = 56.dp, bottom = 32.dp, end = 32.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "INDUSTRIAL TECHNO • 135 BPM",
+                text = video.subtitle.uppercase(),
                 color = MaterialTheme.colorScheme.primary,
                 style = MaterialTheme.typography.labelMedium
             )
@@ -100,7 +99,7 @@ fun DetailsScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "${video.subtitle} • ${video.duration}",
+                text = "Live DJ Set",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleMedium
             )
@@ -108,18 +107,19 @@ fun DetailsScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Recorded live from the underground vaults. A relentless, driving techno journey featuring heavy bass kicks, acid synths, and classic 909 percussion. \n\nGear: 4x CDJ-3000, Allen & Heath Xone:96, RMX-1000.",
+                text = if (video.description.isNotBlank()) video.description else "No description provided by the creator.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Action Buttons Row
             Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                 // Play Button
                 Button(
-                    onClick = { /* TODO: Launch Visualizer/Player */ },
+                    onClick = onPlayClicked, // 2. REPLACED THE TODO WITH THIS ACTION
                     colors = ButtonDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.primary,
                         focusedContentColor = MaterialTheme.colorScheme.onBackground,

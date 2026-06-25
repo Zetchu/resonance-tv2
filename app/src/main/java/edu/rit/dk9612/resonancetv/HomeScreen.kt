@@ -12,23 +12,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.*
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+
 
 @Composable
-fun HomeScreen(onVideoClick: (VideoItem) -> Unit) {
-    // LazyColumn allows vertical scrolling via the D-pad
+fun HomeScreen(
+    onVideoClick: (VideoItem) -> Unit,
+    homeViewModel: HomeViewModel = viewModel() // Inject the ViewModel
+) {
+    // Observe the live data coming from the internet!
+    val categories by homeViewModel.uiState.collectAsState()
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 80.dp) // Safe area padding
+        contentPadding = PaddingValues(bottom = 80.dp)
     ) {
-        // 1. The Hero Banner at the top
         item {
             HeroBanner()
         }
 
-        // 2. The Horizontal Carousels
-        items(MockData.homeCategories) { category ->
-            // UPDATE 2: Pass the lambda down to the Carousel
+        // Use the REAL data instead of MockData.homeCategories
+        items(categories) { category ->
             VideoCarousel(category = category, onVideoClick = onVideoClick)
         }
     }
@@ -121,10 +131,21 @@ fun VideoCard(video: VideoItem, onVideoClick: (VideoItem) -> Unit) {
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Mock Thumbnail Background
+            AsyncImage(
+                model = video.thumbnailUrl,
+                contentDescription = "${video.title} Thumbnail",
+                contentScale = ContentScale.Crop, // This ensures the image fills the 16:9 card perfectly
+                modifier = Modifier.fillMaxSize()
+            )
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF1A1A1A))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)),
+                            startY = 100f
+                        )
+                    )
             )
 
             // Duration Pill in bottom right
@@ -164,3 +185,4 @@ fun VideoCard(video: VideoItem, onVideoClick: (VideoItem) -> Unit) {
         }
     }
 }
+

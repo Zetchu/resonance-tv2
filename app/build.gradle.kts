@@ -1,8 +1,20 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
+
+// 1. Read the local.properties file securely
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+// Get the key, or default to an empty string if it's missing
+val youtubeApiKey = localProperties.getProperty("YOUTUBE_API_KEY") ?: ""
 
 android {
     namespace = "edu.rit.dk9612.resonancetv"
@@ -14,6 +26,9 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        // 2. Inject it as a String into the compiled BuildConfig class
+        buildConfigField("String", "YOUTUBE_API_KEY", "\"$youtubeApiKey\"")
 
     }
 
@@ -30,6 +45,8 @@ android {
     }
     buildFeatures {
         compose = true
+        // 3. Enable BuildConfig generation (it is disabled by default in newer Android Studio versions)
+        buildConfig = true
     }
 }
 
@@ -53,4 +70,10 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation("androidx.compose.runtime:runtime-livedata:1.6.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(libs.youtube.player)
+
 }

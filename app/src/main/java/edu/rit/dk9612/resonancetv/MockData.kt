@@ -4,7 +4,9 @@ data class VideoItem(
     val id: String,
     val title: String,
     val subtitle: String,
-    val duration: String
+    val duration: String,
+    val thumbnailUrl: String = "",
+    val description: String = ""
 )
 
 data class VideoCategory(
