@@ -22,6 +22,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
+import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun DetailsScreen(
@@ -32,6 +35,7 @@ fun DetailsScreen(
     onPlayClicked: () -> Unit // 1. ADDED THIS PARAMETER
 ) {
     BackHandler(onBack = onNavigateBack)
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
         AsyncImage(
@@ -135,7 +139,11 @@ fun DetailsScreen(
 
                 // Save to Sanctuary Button
                 OutlinedButton(
-                    onClick = { onToggleSave(video) },
+                    onClick = { onToggleSave(video)
+                        // 3. ADD THE TOAST FEEDBACK HERE
+                        val msg = if (isSaved) "Removed from Sanctuary" else "Added to Sanctuary"
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                              },
                     colors = OutlinedButtonDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         focusedContentColor = MaterialTheme.colorScheme.primary,
@@ -157,6 +165,21 @@ fun DetailsScreen(
                         text = if (isSaved) "Remove from Sanctuary" else "Add to Sanctuary",
                         style = MaterialTheme.typography.titleMedium
                     )
+                }
+                // NEW: Firebase Share Button!
+                Button(
+                    onClick = { FirestoreRepository.shareVideoToVault(video)
+                        Toast.makeText(context, "Shared to Community Vault!", Toast.LENGTH_SHORT).show()
+                              },
+                    colors = ButtonDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+                        focusedContentColor = MaterialTheme.colorScheme.onBackground,
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                ) {
+                    Text("Share to Vault", style = MaterialTheme.typography.titleMedium)
                 }
             }
         }

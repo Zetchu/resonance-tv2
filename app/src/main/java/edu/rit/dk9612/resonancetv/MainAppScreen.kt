@@ -1,46 +1,45 @@
 package edu.rit.dk9612.resonancetv
 
-import android.content.Intent // Add this
-import android.net.Uri // Add this
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Share // NEW IMPORT
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext // Add this
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.*
+import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository // NEW IMPORT
 
 @Composable
 fun MainAppScreen(
     sanctuaryViewModel: SanctuaryViewModel = viewModel()
 ) {
-    val context = LocalContext.current // Need this to launch Intents
+    val context = LocalContext.current
     var currentScreen by remember { mutableStateOf("Home") }
     var selectedVideo by remember { mutableStateOf<VideoItem?>(null) }
 
-    // NEW: Track if the Hero player is open
     var isHeroPlayerOpen by remember { mutableStateOf(false) }
-    val heroMockVideo = VideoItem("hero_id", "Sónar 2026", "Live", "LIVE", "", "")
+    val heroMockVideo = VideoItem("hero_id", "Sónar 2026", "Live", "LIVE", "", 0, "")
 
     val savedVideosEntities by sanctuaryViewModel.savedVideos.observeAsState(emptyList())
     val sanctuaryList = savedVideosEntities.map { entity ->
         VideoItem(entity.id, entity.title, entity.subtitle, entity.duration)
     }
 
-    // 1. Check if Hero Player should be open
     if (isHeroPlayerOpen) {
         PlayerScreen(
             video = heroMockVideo,
             onNavigateBack = { isHeroPlayerOpen = false }
         )
     }
-    // 2. Check if a normal video is selected
     else if (selectedVideo != null) {
         val isSaved = sanctuaryList.any { it.id == selectedVideo!!.id }
 
@@ -53,13 +52,11 @@ fun MainAppScreen(
                 else sanctuaryViewModel.addVideo(video)
             },
             onPlayClicked = {
-                // LAUNCH THE NATIVE YOUTUBE APP INTENT!
                 try {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + selectedVideo!!.id))
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
                 } catch (e: Exception) {
-                    // Fallback to web browser if the YouTube app isn't installed on the device
                     val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + selectedVideo!!.id))
                     context.startActivity(webIntent)
                 }
@@ -85,6 +82,15 @@ fun MainAppScreen(
                         onClick = { currentScreen = "Library" },
                         leadingContent = { Icon(Icons.Default.Favorite, contentDescription = "Library") }
                     ) { Text("Sanctuary") }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // NEW: The Community Vault Tab!
+                    NavigationDrawerItem(
+                        selected = currentScreen == "Community",
+                        onClick = { currentScreen = "Community" },
+                        leadingContent = { Icon(Icons.Default.Share, contentDescription = "Community") }
+                    ) { Text("Community") }
                 }
             }
         ) {
@@ -92,12 +98,26 @@ fun MainAppScreen(
                 if (currentScreen == "Home") {
                     HomeScreen(
                         onVideoClick = { video: VideoItem -> selectedVideo = video },
-                        onHeroClick = { isHeroPlayerOpen = true } // TRIGGER THE CUSTOM PLAYER
+                        onHeroClick = { isHeroPlayerOpen = true }
                     )
-                } else {
+                } else if (currentScreen == "Library") {
                     LibraryScreen(
                         savedVideos = sanctuaryList,
                         onVideoClick = { video: VideoItem -> selectedVideo = video }
+                    )
+                } else if (currentScreen == "Community") {
+                    // Pull the live Firebase data straight into the state
+                    val communityVideos by FirestoreRepository.getCommunityVideosFlow().collectAsState(initial = emptyList())
+
+                    CommunityVaultScreen(
+                        communityVideos = communityVideos,
+                        savedVideos = sanctuaryList,
+                        onVideoClick = { video: VideoItem -> selectedVideo = video },
+                        onToggleSave = { video ->
+                            val isSaved = sanctuaryList.any { it.id == video.id }
+                            if (isSaved) sanctuaryViewModel.removeVideo(video)
+                            else sanctuaryViewModel.addVideo(video)
+                        }
                     )
                 }
             }
