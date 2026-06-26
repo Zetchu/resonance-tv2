@@ -1,4 +1,4 @@
-package edu.rit.dk9612.resonancetv
+package edu.rit.dk9612.resonancetv.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.*
 import coil.compose.AsyncImage
+import edu.rit.dk9612.resonancetv.VideoItem
 import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository
 
 @Composable

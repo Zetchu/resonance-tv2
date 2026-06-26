@@ -1,4 +1,4 @@
-package edu.rit.dk9612.resonancetv
+package edu.rit.dk9612.resonancetv.ui
 
 import android.content.Intent
 import android.net.Uri
@@ -10,12 +10,13 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Share // NEW IMPORT
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.*
+import edu.rit.dk9612.resonancetv.SanctuaryViewModel
+import edu.rit.dk9612.resonancetv.VideoItem
 import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository // NEW IMPORT
 
 @Composable
@@ -27,7 +28,7 @@ fun MainAppScreen(
     var selectedVideo by remember { mutableStateOf<VideoItem?>(null) }
 
     var isHeroPlayerOpen by remember { mutableStateOf(false) }
-    val heroMockVideo = VideoItem("hero_id", "Sónar 2026", "Live", "LIVE", "", 0, "")
+    val heroMockVideo = VideoItem("hero_id", "Sónar 2026", "Live", "LIVE", "", "", 5)
 
     val savedVideosEntities by sanctuaryViewModel.savedVideos.observeAsState(emptyList())
     val sanctuaryList = savedVideosEntities.map { entity ->

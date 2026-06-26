@@ -4,10 +4,11 @@ data class VideoItem(
     val id: String,
     val title: String,
     val subtitle: String,
-    val duration: String,
+    val duration: String = "N/A", // Default value here!
     val thumbnailUrl: String = "",
+    val description: String = "",
     val likes: Int = 0,
-    val description: String = ""
+    val isLikedByMe: Boolean = false
 )
 
 data class VideoCategory(

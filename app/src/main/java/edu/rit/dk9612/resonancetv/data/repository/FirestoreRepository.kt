@@ -44,13 +44,12 @@ object FirestoreRepository {
                         id = shared.id,
                         title = shared.title,
                         subtitle = shared.subtitle,
-                        duration = "Shared Set",
+                        duration = "Shared Set", // Add this line
                         thumbnailUrl = shared.thumbnailUrl,
                         description = "",
-                        likes = shared.likes // Map the likes to the UI!
+                        likes = shared.likes
                     )
                 } ?: emptyList()
-
                 trySend(videos)
             }
 

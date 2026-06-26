@@ -1,4 +1,4 @@
-package edu.rit.dk9612.resonancetv
+package edu.rit.dk9612.resonancetv.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import edu.rit.dk9612.resonancetv.VideoItem
 
 @Composable
 fun LibraryScreen(

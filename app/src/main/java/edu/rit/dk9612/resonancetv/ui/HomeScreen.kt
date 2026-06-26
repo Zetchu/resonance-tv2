@@ -1,4 +1,4 @@
-package edu.rit.dk9612.resonancetv
+package edu.rit.dk9612.resonancetv.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -19,6 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import edu.rit.dk9612.resonancetv.VideoCategory
+import edu.rit.dk9612.resonancetv.VideoItem
 
 
 @Composable

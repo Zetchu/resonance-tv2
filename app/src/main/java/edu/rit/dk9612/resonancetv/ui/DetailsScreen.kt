@@ -1,10 +1,9 @@
-package edu.rit.dk9612.resonancetv
+package edu.rit.dk9612.resonancetv.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -25,6 +24,7 @@ import coil.compose.AsyncImage
 import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
+import edu.rit.dk9612.resonancetv.VideoItem
 
 @Composable
 fun DetailsScreen(

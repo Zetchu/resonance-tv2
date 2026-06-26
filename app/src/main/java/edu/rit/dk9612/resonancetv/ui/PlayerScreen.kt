@@ -1,4 +1,4 @@
-package edu.rit.dk9612.resonancetv
+package edu.rit.dk9612.resonancetv.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
@@ -16,6 +16,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import edu.rit.dk9612.resonancetv.VideoItem
 
 @OptIn(UnstableApi::class)
 @Composable

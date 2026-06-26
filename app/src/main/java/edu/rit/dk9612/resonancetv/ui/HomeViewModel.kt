@@ -1,8 +1,10 @@
-package edu.rit.dk9612.resonancetv
+package edu.rit.dk9612.resonancetv.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import edu.rit.dk9612.resonancetv.BuildConfig
+import edu.rit.dk9612.resonancetv.VideoCategory
+import edu.rit.dk9612.resonancetv.VideoItem
 import edu.rit.dk9612.resonancetv.data.network.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
