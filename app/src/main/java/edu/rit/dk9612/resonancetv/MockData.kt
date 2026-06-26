@@ -6,6 +6,7 @@ data class VideoItem(
     val subtitle: String,
     val duration: String,
     val thumbnailUrl: String = "",
+    val likes: Int = 0,
     val description: String = ""
 )
 

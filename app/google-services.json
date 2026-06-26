@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "521081082866",
+    "project_id": "resonancetv-1a661",
+    "storage_bucket": "resonancetv-1a661.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521081082866:android:ba0eef05c0bd55e7e5116b",
+        "android_client_info": {
+          "package_name": "edu.rit.dk9612.resonancetv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi_A8_fAtJV4eVY8SbX5UpO3dHUDdnR24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

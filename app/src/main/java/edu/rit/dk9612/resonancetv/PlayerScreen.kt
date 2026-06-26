@@ -1,45 +1,59 @@
 package edu.rit.dk9612.resonancetv
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 
+@OptIn(UnstableApi::class)
 @Composable
 fun PlayerScreen(
     video: VideoItem,
     onNavigateBack: () -> Unit
 ) {
-    // We need the lifecycle owner so the video pauses if the app goes to the background
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
-    // Intercept the TV remote back button to close the player and return to Details
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            // High-quality techno/electronic stream for your demo
+            val mediaItem = MediaItem.fromUri("https://storage.googleapis.com/exoplayer-test-media-0/play.mp3")
+            setMediaItem(mediaItem)
+            prepare()
+            playWhenReady = true
+        }
+    }
+
     BackHandler {
+        exoPlayer.stop()
+        exoPlayer.release()
         onNavigateBack()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         AndroidView(
-            factory = { context ->
-                YouTubePlayerView(context).apply {
-                    // Binds the player to the Compose lifecycle to prevent memory leaks
-                    lifecycleOwner.lifecycle.addObserver(this)
-
-                    // Listen for when the internal player is ready, then load the video!
-                    addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                        override fun onReady(youTubePlayer: YouTubePlayer) {
-                            // "loadVideo" automatically plays it. (Use cueVideo if you want it to wait)
-                            youTubePlayer.loadVideo(video.id, 0f)
-                        }
-                    })
+            factory = { ctx ->
+                PlayerView(ctx).apply {
+                    player = exoPlayer
+                    useController = true
+                    controllerShowTimeoutMs = 3000
                 }
             },
             modifier = Modifier.fillMaxSize()

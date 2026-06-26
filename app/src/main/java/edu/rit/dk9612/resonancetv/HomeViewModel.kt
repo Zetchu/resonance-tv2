@@ -25,29 +25,33 @@ class HomeViewModel : ViewModel() {
             try {
                 // Fetch two different categories in parallel
                 val technoResponse = RetrofitInstance.api.searchVideos(query = "Industrial Techno DJ Set", apiKey = YOUTUBE_API_KEY)
-                val boilerRoomResponse = RetrofitInstance.api.searchVideos(query = "Boiler Room DJ Set", apiKey = YOUTUBE_API_KEY)
+                val boilerRoomResponse = RetrofitInstance.api.searchVideos(query = "Boiler Room Set", apiKey = YOUTUBE_API_KEY)
 
                 // Map the network data to our UI VideoItem model
-                val technoVideos = technoResponse.items.map { item ->
-                    VideoItem(
-                        id = item.id.videoId,
-                        title = item.snippet.title,
-                        subtitle = item.snippet.channelTitle,
-                        duration = "Live Set", // YouTube search API doesn't return duration easily, so we use a placeholder string
-                        thumbnailUrl = item.snippet.thumbnails.high.url,
-                        description = item.snippet.description
-                    )
+                val technoVideos = technoResponse.items.mapNotNull { item ->
+                    item.id.videoId?.let { validId ->
+                        VideoItem(
+                            id = validId,
+                            title = item.snippet.title,
+                            subtitle = item.snippet.channelTitle,
+                            duration = "Live Set",
+                            thumbnailUrl = item.snippet.thumbnails.high.url,
+                            description = item.snippet.description
+                        )
+                    }
                 }
 
-                val boilerRoomVideos = boilerRoomResponse.items.map { item ->
-                    VideoItem(
-                        id = item.id.videoId,
-                        title = item.snippet.title,
-                        subtitle = item.snippet.channelTitle,
-                        duration = "Live Set",
-                        thumbnailUrl = item.snippet.thumbnails.high.url,
-                        description = item.snippet.description
-                    )
+                val boilerRoomVideos = boilerRoomResponse.items.mapNotNull { item ->
+                    item.id.videoId?.let { validId ->
+                        VideoItem(
+                            id = validId,
+                            title = item.snippet.title,
+                            subtitle = item.snippet.channelTitle,
+                            duration = "Live Set",
+                            thumbnailUrl = item.snippet.thumbnails.high.url,
+                            description = item.snippet.description
+                        )
+                    }
                 }
 
                 // Push the real data to the UI!

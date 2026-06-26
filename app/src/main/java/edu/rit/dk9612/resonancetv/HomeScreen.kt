@@ -24,6 +24,7 @@ import coil.compose.AsyncImage
 @Composable
 fun HomeScreen(
     onVideoClick: (VideoItem) -> Unit,
+    onHeroClick: () -> Unit,
     homeViewModel: HomeViewModel = viewModel() // Inject the ViewModel
 ) {
     // Observe the live data coming from the internet!
@@ -34,7 +35,7 @@ fun HomeScreen(
         contentPadding = PaddingValues(bottom = 80.dp)
     ) {
         item {
-            HeroBanner()
+            HeroBanner(onHeroClick = onHeroClick)
         }
 
         // Use the REAL data instead of MockData.homeCategories
@@ -43,36 +44,60 @@ fun HomeScreen(
         }
     }
 }
-
 @Composable
-fun HeroBanner() {
-    // This represents the featured "Sónar Festival 2026" banner
-    Box(
+fun HeroBanner(onHeroClick: () -> Unit) {
+    Card(
+        onClick = onHeroClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(300.dp)
-            .padding(start = 32.dp, end = 32.dp, top = 32.dp, bottom = 16.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(24.dp)
-            )
+            .padding(start = 32.dp, end = 32.dp, top = 32.dp, bottom = 16.dp),
+        colors = CardDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        shape = CardDefaults.shape(shape = RoundedCornerShape(24.dp)),
+        scale = CardDefaults.scale(focusedScale = 1.02f)
     ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(32.dp)
-        ) {
-            Text(
-                text = "LIVE NOW • Gear: 3x CDJ-3000s, V10 Mixer",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            // 1. The Sónar Barcelona Background Image
+            AsyncImage(
+                model = "https://www.webarcelona.net/sites/default/files/styles/event_guide_new/public/events/sonar-barcelona-escenario-noche.webp?itok=CNrcuTk9",
+                contentDescription = "Sónar Festival Background",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Sónar Festival 2026\nMainstage Experience",
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.headlineLarge
+
+            // 2. A dark gradient overlay so the white text pops!
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)),
+                            startY = 200f // Starts fading to black near the bottom
+                        )
+                    )
             )
+
+            // 3. Your Text Data
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(32.dp)
+            ) {
+                Text(
+                    text = "LIVE NOW • Gear: 3x CDJ-3000s, V10 Mixer",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Sónar Festival 2026\nMainstage Experience",
+                    color = Color.White, // Forced to white so it contrasts the dark gradient
+                    style = MaterialTheme.typography.headlineLarge
+                )
+            }
         }
     }
 }

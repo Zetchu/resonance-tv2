@@ -12,7 +12,7 @@ data class YouTubeItem(
 )
 
 data class VideoId(
-    val videoId: String
+    val videoId: String?
 )
 
 data class VideoSnippet(
