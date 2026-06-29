@@ -1,18 +1,24 @@
 package edu.rit.dk9612.resonancetv.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.*
 import coil.compose.AsyncImage
@@ -31,13 +37,30 @@ fun CommunityVaultScreen(
             .fillMaxSize()
             .padding(top = 48.dp, start = 32.dp, end = 32.dp)
     ) {
+        // Headers matching the reference image
         Text(
-            text = "Community Vault",
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.displaySmall
+            text = "VIBE CHECK: COMMUNITY",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.displayMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Connecting the pulse of the underground. See what the\nsanctuary is playing right now.",
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.titleMedium
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Shared by Community",
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         if (communityVideos.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -47,72 +70,76 @@ fun CommunityVaultScreen(
                 )
             }
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+            // Using a Vertical Grid for the side-by-side large cards
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
                 contentPadding = PaddingValues(bottom = 48.dp)
             ) {
                 items(communityVideos) { video ->
                     val isSaved = savedVideos.any { it.id == video.id }
-                    CommunityVideoRow(
+                    CommunityCard(
                         video = video,
                         isSaved = isSaved,
                         onVideoClick = { onVideoClick(video) },
                         onToggleSave = { onToggleSave(video) },
-                        onLikeClick = { FirestoreRepository.likeVideo(video.id) }
+                        onLikeClick = { FirestoreRepository.toggleLike(video) } // Links directly to your transactional Firebase setup
                     )
                 }
             }
         }
     }
 }
-
 @Composable
-fun CommunityVideoRow(
+fun CommunityCard(
     video: VideoItem,
     isSaved: Boolean,
     onVideoClick: () -> Unit,
     onToggleSave: () -> Unit,
     onLikeClick: () -> Unit
 ) {
-    // 1. Grab the context HERE so the Toasts can use it!
     val context = LocalContext.current
 
-    // 2. The main container is now a simple, unfocusable Row
-    Row(
+    // 1. The VISUAL Container: Looks like a card, but is NOT focusable.
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .background(
+                color = MaterialTheme.colorScheme.surface, // Gives it the dark card background
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(bottom = 16.dp) // Padding for the bottom of the "card"
     ) {
-        // 3. The Card is only for the Image and Text (takes up the left side)
+
+        // 2. The INTERACTIVE Top Half: Focusable to open the video
         Card(
             onClick = onVideoClick,
-            modifier = Modifier
-                .weight(1f) // Takes up all remaining space left of the buttons
-                .fillMaxHeight(),
-            colors = CardDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
+            modifier = Modifier.fillMaxWidth(),
+            // Make the background transparent so the Column's background shows through
+            colors = CardDefaults.colors(containerColor = Color.Transparent),
+            // Flatten the bottom corners so it seamlessly blends into the rest of the column!
+            shape = CardDefaults.shape(shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 0.dp, bottomEnd = 0.dp)),
             scale = CardDefaults.scale(focusedScale = 1.02f)
         ) {
-            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = video.thumbnailUrl,
-                    contentDescription = "Thumbnail",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .width(200.dp)
-                        .fillMaxHeight()
-                )
+            Column {
+                Box(modifier = Modifier.fillMaxWidth().height(180.dp)) {
+                    AsyncImage(
+                        model = video.thumbnailUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp)
-                ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = video.title,
+                        color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium,
                         maxLines = 1
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = video.subtitle,
                         style = MaterialTheme.typography.bodySmall,
@@ -123,39 +150,55 @@ fun CommunityVideoRow(
             }
         }
 
-        // 4. The Action Buttons sit OUTSIDE the Card, making them individually focusable!
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 3. The Action Buttons: Siblings to the Card so the D-pad can reach them!
         Row(
-            modifier = Modifier.padding(start = 24.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Like Button & Counter
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = {
+            // Like Button
+            Button(
+                onClick = {
                     onLikeClick()
-                    // TOAST FEEDBACK
-                    Toast.makeText(context, "Liked Set!", Toast.LENGTH_SHORT).show()
-                }){
-                    Icon(Icons.Default.ThumbUp, contentDescription = "Like")
-                }
-                Text(
-                    text = "${video.likes}",
-                    style = MaterialTheme.typography.titleMedium, // Made slightly bigger for TV
-                    modifier = Modifier.padding(start = 8.dp)
+                    val msg = if (video.isLikedByMe) "Unliked Set" else "Liked Set!"
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.colors(
+                    containerColor = if (video.isLikedByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 )
+            ) {
+                Icon(
+                    imageVector = if (video.isLikedByMe) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp,
+                    contentDescription = "Like"
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                val likesText = if (video.likes >= 1000) "${String.format("%.1f", video.likes / 1000.0)}k" else "${video.likes}"
+                Text(likesText)
             }
 
-            // Save to Sanctuary Button
-            IconButton(onClick = {
-                onToggleSave()
-                // TOAST FEEDBACK
-                val msg = if (isSaved) "Removed from Sanctuary" else "Added to Sanctuary"
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-            }) {
+            // Save Button
+            OutlinedButton(
+                onClick = {
+                    onToggleSave()
+                    val msg = if (isSaved) "Removed from Sanctuary" else "Added to Sanctuary"
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.weight(1f),
+                colors = OutlinedButtonDefaults.colors(
+                    containerColor = if (isSaved) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent
+                )
+            ) {
                 Icon(
                     imageVector = if (isSaved) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Save"
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(if (isSaved) "Saved" else "Save")
             }
         }
     }

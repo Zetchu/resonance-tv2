@@ -32,7 +32,13 @@ fun MainAppScreen(
 
     val savedVideosEntities by sanctuaryViewModel.savedVideos.observeAsState(emptyList())
     val sanctuaryList = savedVideosEntities.map { entity ->
-        VideoItem(entity.id, entity.title, entity.subtitle, entity.duration)
+        VideoItem(
+            id = entity.id,
+            title = entity.title,
+            subtitle = entity.subtitle,
+            duration = entity.duration,
+            thumbnailUrl = entity.thumbnailUrl
+        )
     }
 
     if (isHeroPlayerOpen) {
@@ -42,10 +48,14 @@ fun MainAppScreen(
         )
     }
     else if (selectedVideo != null) {
-        val isSaved = sanctuaryList.any { it.id == selectedVideo!!.id }
+        // 1. Convert the static selectedVideo into a LIVE state!
+        val liveVideo by FirestoreRepository.getLiveVideoFlow(selectedVideo!!)
+            .collectAsState(initial = selectedVideo!!)
+
+        val isSaved = sanctuaryList.any { it.id == liveVideo.id }
 
         DetailsScreen(
-            video = selectedVideo!!,
+            video = liveVideo, // 2. Pass the LIVE video here instead of selectedVideo!!
             isSaved = isSaved,
             onNavigateBack = { selectedVideo = null },
             onToggleSave = { video ->
@@ -54,16 +64,21 @@ fun MainAppScreen(
             },
             onPlayClicked = {
                 try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + selectedVideo!!.id))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + liveVideo.id))
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
                 } catch (e: Exception) {
-                    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + selectedVideo!!.id))
+                    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + liveVideo.id))
                     context.startActivity(webIntent)
                 }
+            },
+            onLikeToggle = { video ->
+                // This triggers the database transaction.
+                // As soon as Firebase updates, getLiveVideoFlow catches it and updates the UI instantly!
+                FirestoreRepository.toggleLike(video)
             }
         )
-    } else {
+    }else {
         NavigationDrawer(
             drawerContent = { drawerValue ->
                 Column(

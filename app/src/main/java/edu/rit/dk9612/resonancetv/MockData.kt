@@ -8,7 +8,8 @@ data class VideoItem(
     val thumbnailUrl: String = "",
     val description: String = "",
     val likes: Int = 0,
-    val isLikedByMe: Boolean = false
+    val isLikedByMe: Boolean = false,
+    val sharedAt: java.util.Date? = null
 )
 
 data class VideoCategory(

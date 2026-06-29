@@ -27,6 +27,7 @@ class SanctuaryViewModel(application: Application) : AndroidViewModel(applicatio
         id = video.id,
         title = video.title,
         subtitle = video.subtitle,
-        duration = video.duration
+        duration = video.duration,
+        thumbnailUrl = video.thumbnailUrl
     )
 }

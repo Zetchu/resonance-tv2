@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository
 import android.widget.Toast
+import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.ui.platform.LocalContext
 import edu.rit.dk9612.resonancetv.VideoItem
 
@@ -32,7 +34,8 @@ fun DetailsScreen(
     isSaved: Boolean,
     onNavigateBack: () -> Unit,
     onToggleSave: (VideoItem) -> Unit,
-    onPlayClicked: () -> Unit // 1. ADDED THIS PARAMETER
+    onPlayClicked: () -> Unit, // 1. ADDED THIS PARAMETER
+    onLikeToggle: (VideoItem) -> Unit
 ) {
     BackHandler(onBack = onNavigateBack)
     val context = LocalContext.current
@@ -166,20 +169,20 @@ fun DetailsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
-                // NEW: Firebase Share Button!
+                // 3. Like Button (Public Firebase Feed)
                 Button(
-                    onClick = { FirestoreRepository.shareVideoToVault(video)
-                        Toast.makeText(context, "Shared to Community Vault!", Toast.LENGTH_SHORT).show()
-                              },
+                    onClick = {
+                        onLikeToggle(video)
+                        val msg = if (video.isLikedByMe) "Unliked Set" else "Liked Set!"
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    },
                     colors = ButtonDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.primary,
-                        focusedContentColor = MaterialTheme.colorScheme.onBackground,
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                    contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+                        containerColor = if (video.isLikedByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                    )
                 ) {
-                    Text("Share to Vault", style = MaterialTheme.typography.titleMedium)
+                    Icon(if (video.isLikedByMe) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp, null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("${video.likes} Likes") // Or just "Like" if you prefer
                 }
             }
         }

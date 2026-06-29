@@ -9,6 +9,6 @@ data class SharedVideo(
     val title: String = "",
     val subtitle: String = "",
     val thumbnailUrl: String = "",
-    val likes: Int = 0,
+    val likedBy: List<String> = emptyList(),
     @ServerTimestamp val sharedAt: Date? = null // Firebase will automatically fill this in!
 )

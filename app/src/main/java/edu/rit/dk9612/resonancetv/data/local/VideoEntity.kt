@@ -16,5 +16,9 @@ data class VideoEntity(
     val subtitle: String,
 
     @ColumnInfo(name = "duration")
-    val duration: String
+    val duration: String,
+
+    @ColumnInfo(name = "thumbnailUrl")
+val thumbnailUrl: String = ""
+
 )
