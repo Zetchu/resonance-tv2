@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.*
 import coil.compose.AsyncImage
-import edu.rit.dk9612.resonancetv.VideoItem
+import edu.rit.dk9612.resonancetv.data.model.VideoItem
 import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository
 
 @Composable

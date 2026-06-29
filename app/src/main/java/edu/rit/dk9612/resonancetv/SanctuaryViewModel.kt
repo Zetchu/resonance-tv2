@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import edu.rit.dk9612.resonancetv.data.local.AppDatabase
 import edu.rit.dk9612.resonancetv.data.local.VideoEntity
+import edu.rit.dk9612.resonancetv.data.model.VideoItem
 import edu.rit.dk9612.resonancetv.data.repository.SanctuaryRepository
 
 class SanctuaryViewModel(application: Application) : AndroidViewModel(application) {

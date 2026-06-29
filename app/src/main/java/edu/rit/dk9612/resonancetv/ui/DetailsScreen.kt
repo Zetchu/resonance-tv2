@@ -26,7 +26,8 @@ import android.widget.Toast
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.ui.platform.LocalContext
-import edu.rit.dk9612.resonancetv.VideoItem
+import edu.rit.dk9612.resonancetv.data.model.VideoItem
+
 
 @Composable
 fun DetailsScreen(

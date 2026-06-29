@@ -12,7 +12,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.*
 import coil.compose.AsyncImage
-import edu.rit.dk9612.resonancetv.VideoItem
+import edu.rit.dk9612.resonancetv.data.model.VideoItem
+
 
 @Composable
 fun LibraryScreen(savedVideos: List<VideoItem>, onVideoClick: (VideoItem) -> Unit) {

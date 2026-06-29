@@ -16,7 +16,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import edu.rit.dk9612.resonancetv.VideoItem
+import edu.rit.dk9612.resonancetv.data.model.VideoItem
 
 @OptIn(UnstableApi::class)
 @Composable

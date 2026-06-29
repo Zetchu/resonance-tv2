@@ -78,6 +78,7 @@ dependencies {
     implementation(libs.youtube.player)
     implementation("androidx.media3:media3-exoplayer:1.3.1")
     implementation("androidx.media3:media3-ui:1.3.1")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
     implementation("com.google.firebase:firebase-firestore")

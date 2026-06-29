@@ -1,33 +1,30 @@
 package edu.rit.dk9612.resonancetv.data.network
 
-import com.google.gson.annotations.SerializedName
-
-data class YouTubeSearchResponse(
-    val items: List<YouTubeItem>
+// This represents the outermost JSON object
+data class SearchResponse(
+    val items: List<YouTubeItem> = emptyList()
 )
 
 data class YouTubeItem(
     val id: VideoId,
-    val snippet: VideoSnippet
+    val snippet: Snippet
 )
 
 data class VideoId(
-    val videoId: String?
+    val videoId: String? = null // Sometimes YouTube returns playlists, so this can be null
 )
 
-data class VideoSnippet(
+data class Snippet(
     val title: String,
     val description: String,
     val channelTitle: String,
-    val thumbnails: Thumbnails // Add this!
+    val thumbnails: Thumbnails
 )
 
-// Add these new classes to map the thumbnail URLs
 data class Thumbnails(
-    val medium: ThumbnailInfo,
-    val high: ThumbnailInfo
+    val high: HighThumbnail
 )
 
-data class ThumbnailInfo(
+data class HighThumbnail(
     val url: String
 )

@@ -8,20 +8,19 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.*
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
-import edu.rit.dk9612.resonancetv.VideoCategory
-import edu.rit.dk9612.resonancetv.VideoItem
-
+import edu.rit.dk9612.resonancetv.data.model.VideoCategory
+import edu.rit.dk9612.resonancetv.data.model.VideoItem
 
 @Composable
 fun HomeScreen(
@@ -30,22 +29,52 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = viewModel() // Inject the ViewModel
 ) {
     // Observe the live data coming from the internet!
-    val categories by homeViewModel.uiState.collectAsState()
+    val uiState by homeViewModel.uiState.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 80.dp)
-    ) {
-        item {
-            HeroBanner(onHeroClick = onHeroClick)
+    // React to the current state
+    when (val state = uiState) {
+
+        is HomeUiState.Loading -> {
+            // Show a loading spinner right in the middle of the screen
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = "Loading Sanctuary Data...",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
         }
 
-        // Use the REAL data instead of MockData.homeCategories
-        items(categories) { category ->
-            VideoCarousel(category = category, onVideoClick = onVideoClick)
+        is HomeUiState.Error -> {
+            // Show the error message if the internet drops or quota is hit
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
+
+        is HomeUiState.Success -> {
+            // We have data! Grab the categories and show your normal UI
+            val categories = state.categories
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 80.dp)
+            ) {
+                item {
+                    HeroBanner(onHeroClick = onHeroClick)
+                }
+                items(categories) { category ->
+                    VideoCarousel(category = category, onVideoClick = onVideoClick)
+                }
+            }
         }
     }
 }
+
 @Composable
 fun HeroBanner(onHeroClick: () -> Unit) {
     Card(
@@ -121,7 +150,7 @@ fun VideoCarousel(category: VideoCategory, onVideoClick: (VideoItem) -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             items(category.videos) { video ->
-                // UPDATE 3: Pass the lambda down to the Card
+                // Pass the lambda down to the Card
                 VideoCard(video = video, onVideoClick = onVideoClick)
             }
         }
@@ -132,7 +161,7 @@ fun VideoCarousel(category: VideoCategory, onVideoClick: (VideoItem) -> Unit) {
 fun VideoCard(video: VideoItem, onVideoClick: (VideoItem) -> Unit) {
     // The TV Material Card automatically handles D-pad focus scaling!
     Card(
-        // UPDATE 4: Actually trigger the click with the current video!
+        // Actually trigger the click with the current video!
         onClick = { onVideoClick(video) },
         modifier = Modifier
             .width(280.dp)
@@ -157,7 +186,7 @@ fun VideoCard(video: VideoItem, onVideoClick: (VideoItem) -> Unit) {
         scale = CardDefaults.scale(focusedScale = 1.05f) // 5% focus scale from design.md
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Mock Thumbnail Background
+            // Thumbnail Background
             AsyncImage(
                 model = video.thumbnailUrl,
                 contentDescription = "${video.title} Thumbnail",
@@ -198,13 +227,13 @@ fun VideoCard(video: VideoItem, onVideoClick: (VideoItem) -> Unit) {
             ) {
                 Text(
                     text = video.title,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color.White, // Adjusted for contrast over the image
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1
                 )
                 Text(
                     text = video.subtitle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = Color.LightGray, // Adjusted for contrast over the image
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1
                 )
@@ -212,4 +241,3 @@ fun VideoCard(video: VideoItem, onVideoClick: (VideoItem) -> Unit) {
         }
     }
 }
-

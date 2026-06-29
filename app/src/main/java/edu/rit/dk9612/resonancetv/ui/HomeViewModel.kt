@@ -2,69 +2,49 @@ package edu.rit.dk9612.resonancetv.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import edu.rit.dk9612.resonancetv.BuildConfig
-import edu.rit.dk9612.resonancetv.VideoCategory
-import edu.rit.dk9612.resonancetv.VideoItem
-import edu.rit.dk9612.resonancetv.data.network.RetrofitInstance
+import edu.rit.dk9612.resonancetv.data.model.VideoCategory
+import edu.rit.dk9612.resonancetv.data.repository.YouTubeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
+// 1. Define the possible states of our Home Screen
+sealed interface HomeUiState {
+    object Loading : HomeUiState
+    data class Success(val categories: List<VideoCategory>) : HomeUiState
+    data class Error(val message: String) : HomeUiState
+}
 
 class HomeViewModel : ViewModel() {
 
-    // You will need to get a free API key from the Google Cloud Console
-    private val YOUTUBE_API_KEY = BuildConfig.YOUTUBE_API_KEY
+    // 2. Grab our clean repository
+    private val repository = YouTubeRepository()
 
-    private val _uiState = MutableStateFlow<List<VideoCategory>>(emptyList())
-    val uiState: StateFlow<List<VideoCategory>> = _uiState
+    // 3. Set up the StateFlow that the UI will observe
+    private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
         fetchHomeContent()
     }
 
-    private fun fetchHomeContent() {
+    fun fetchHomeContent() {
         viewModelScope.launch {
+            _uiState.value = HomeUiState.Loading // Tell UI to show a spinner
+
             try {
-                // Fetch two different categories in parallel
-                val technoResponse = RetrofitInstance.api.searchVideos(query = "Industrial Techno DJ Set", apiKey = YOUTUBE_API_KEY)
-                val boilerRoomResponse = RetrofitInstance.api.searchVideos(query = "Boiler Room Set", apiKey = YOUTUBE_API_KEY)
+                // Ask the repository for the data
+                val categories = repository.getHomeCategories()
 
-                // Map the network data to our UI VideoItem model
-                val technoVideos = technoResponse.items.mapNotNull { item ->
-                    item.id.videoId?.let { validId ->
-                        VideoItem(
-                            id = validId,
-                            title = item.snippet.title,
-                            subtitle = item.snippet.channelTitle,
-                            duration = "Live Set",
-                            thumbnailUrl = item.snippet.thumbnails.high.url,
-                            description = item.snippet.description
-                        )
-                    }
+                if (categories.isNotEmpty()) {
+                    _uiState.value = HomeUiState.Success(categories)
+                } else {
+                    _uiState.value = HomeUiState.Error("No videos found. Check your network or API quota.")
                 }
-
-                val boilerRoomVideos = boilerRoomResponse.items.mapNotNull { item ->
-                    item.id.videoId?.let { validId ->
-                        VideoItem(
-                            id = validId,
-                            title = item.snippet.title,
-                            subtitle = item.snippet.channelTitle,
-                            duration = "Live Set",
-                            thumbnailUrl = item.snippet.thumbnails.high.url,
-                            description = item.snippet.description
-                        )
-                    }
-                }
-
-                // Push the real data to the UI!
-                _uiState.value = listOf(
-                    VideoCategory("Trending Techno Sets", technoVideos),
-                    VideoCategory("Recent Boiler Rooms", boilerRoomVideos)
-                )
-
             } catch (e: Exception) {
-                // Handle no internet or API errors here
                 e.printStackTrace()
+                _uiState.value = HomeUiState.Error("Network Error: ${e.localizedMessage}")
             }
         }
     }
