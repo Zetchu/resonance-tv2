@@ -16,10 +16,10 @@ sealed interface HomeUiState {
     data class Error(val message: String) : HomeUiState
 }
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(  private val repository: YouTubeRepository = YouTubeRepository()) : ViewModel() {
 
     // 2. Grab our clean repository
-    private val repository = YouTubeRepository()
+
 
     // 3. Set up the StateFlow that the UI will observe
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)

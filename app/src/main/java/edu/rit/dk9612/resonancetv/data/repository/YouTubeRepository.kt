@@ -7,11 +7,11 @@ import edu.rit.dk9612.resonancetv.data.network.YouTubeItem // <--- IMPORT THIS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class YouTubeRepository {
+open class YouTubeRepository {
 
     private val api = RetrofitInstance.api
 
-    suspend fun getHomeCategories(): List<VideoCategory> = withContext(Dispatchers.IO) {
+    open suspend fun getHomeCategories(): List<VideoCategory> = withContext(Dispatchers.IO) {
         try {
             val technoResponse = api.searchVideos(query = "Industrial Techno DJ Set")
             val boilerRoomResponse = api.searchVideos(query = "Boiler Room Set")

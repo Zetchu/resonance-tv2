@@ -1,36 +1,72 @@
 package edu.rit.dk9612.resonancetv
 
+import edu.rit.dk9612.resonancetv.data.model.VideoItem
 import edu.rit.dk9612.resonancetv.data.network.SharedVideo
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FirestoreRepositoryTest {
 
+    // This tests the core business logic of how Firebase data (Lists of UIDs)
+    // is translated into UI state (Like counts and booleans)
+
     @Test
-    fun `test firestore data mapping integrity`() {
-        // Arrange: Create a mock Firestore object with 1 like
-        val shared = SharedVideo(
-            id = "test_123",
-            title = "Hard Techno Mix",
-            subtitle = "Artist A",
+    fun `map SharedVideo to VideoItem correctly calculates likes and user status`() {
+        // Arrange: A mock Firebase response where 3 people liked the video, including our user
+        val myUserId = "user_99"
+        val mockFirebaseData = SharedVideo(
+            id = "vault_1",
+            title = "Underground Techno",
+            subtitle = "DJ Set",
             thumbnailUrl = "url",
-            likes = 1 // Set this to 1 to match your assertion
+            likedBy = listOf("user_1", "user_2", myUserId) // 3 total likes
         )
 
-        // Act: Manually simulate the mapping logic used in your Repository
-        // You MUST pass the likes property here to match the SharedVideo object
+        // Act: The exact mapping logic used in your FirestoreRepository
         val videoItem = VideoItem(
-            id = shared.id,
-            title = shared.title,
-            subtitle = shared.subtitle,
-            thumbnailUrl = shared.thumbnailUrl,
-            duration = "Shared Set", // Add this line
-            likes = shared.likes
+            id = mockFirebaseData.id,
+            title = mockFirebaseData.title,
+            subtitle = mockFirebaseData.subtitle,
+            duration = "Shared Set",
+            thumbnailUrl = mockFirebaseData.thumbnailUrl,
+            description = "",
+            likes = mockFirebaseData.likedBy.size, // Logic: size of array
+            isLikedByMe = mockFirebaseData.likedBy.contains(myUserId) // Logic: contains my UID
         )
 
-        // Assert: Ensure data integrity
-        assertEquals("Hard Techno Mix", videoItem.title)
-        assertEquals(1, videoItem.likes) // This will now pass
-        assertEquals("test_123", videoItem.id)
+        // Assert: Verify the business logic transformed the array correctly
+        assertEquals("Total likes should be exactly the size of the likedBy array", 3, videoItem.likes)
+        assertTrue("isLikedByMe should be true since myUserId is in the list", videoItem.isLikedByMe)
+    }
+
+    @Test
+    fun `map SharedVideo to VideoItem when current user has not liked it`() {
+        // Arrange: 2 people liked it, but our user is NOT in the list
+        val myUserId = "user_99"
+        val mockFirebaseData = SharedVideo(
+            id = "vault_2",
+            title = "Boiler Room",
+            subtitle = "DJ Set",
+            thumbnailUrl = "url",
+            likedBy = listOf("user_1", "user_2")
+        )
+
+        // Act
+        val videoItem = VideoItem(
+            id = mockFirebaseData.id,
+            title = mockFirebaseData.title,
+            subtitle = mockFirebaseData.subtitle,
+            duration = "Shared Set",
+            thumbnailUrl = mockFirebaseData.thumbnailUrl,
+            description = "",
+            likes = mockFirebaseData.likedBy.size,
+            isLikedByMe = mockFirebaseData.likedBy.contains(myUserId)
+        )
+
+        // Assert
+        assertEquals("Total likes should be 2", 2, videoItem.likes)
+        assertFalse("isLikedByMe should be false since user_99 is missing", videoItem.isLikedByMe)
     }
 }

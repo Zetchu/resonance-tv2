@@ -23,18 +23,17 @@ import androidx.tv.material3.*
 import edu.rit.dk9612.resonancetv.SanctuaryViewModel
 import edu.rit.dk9612.resonancetv.data.model.VideoItem
 
-import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository
-
 @Composable
 fun MainAppScreen(
-    sanctuaryViewModel: SanctuaryViewModel = viewModel()
+    sanctuaryViewModel: SanctuaryViewModel = viewModel(),
+    communityViewModel: CommunityViewModel = viewModel() // 1. Injected the new ViewModel!
 ) {
     val context = LocalContext.current
 
-    // 1. Initialize the Navigation Controller
+    // Initialize the Navigation Controller
     val navController = rememberNavController()
 
-    // 2. State to hold the complex VideoItem while we navigate using its ID
+    // State to hold the complex VideoItem while we navigate using its ID
     var sharedSelectedVideo by remember { mutableStateOf<VideoItem?>(null) }
     val heroMockVideo = VideoItem("hero_id", "Sónar 2026", "Live", "LIVE", "", "", 5)
 
@@ -50,7 +49,7 @@ fun MainAppScreen(
         )
     }
 
-    // 3. The NavHost handles all screen routing
+    // The NavHost handles all screen routing
     NavHost(navController = navController, startDestination = "home") {
 
         // --- MAIN TABS (Wrapped in our Drawer layout) ---
@@ -84,7 +83,8 @@ fun MainAppScreen(
 
         composable("community") {
             MainLayoutWithDrawer(currentRoute = "community", navController = navController) {
-                val communityVideos by FirestoreRepository.getCommunityVideosFlow().collectAsState(initial = emptyList())
+                // 2. Used CommunityViewModel instead of FirestoreRepository
+                val communityVideos by communityViewModel.communityVideosFlow.collectAsState(initial = emptyList())
 
                 CommunityVaultScreen(
                     communityVideos = communityVideos,
@@ -111,8 +111,8 @@ fun MainAppScreen(
             // Ensure we have data for the ID that was passed
             if (sharedSelectedVideo != null && sharedSelectedVideo?.id == videoId) {
 
-                // Apply our live Firebase listener we built previously
-                val liveVideo by FirestoreRepository.getLiveVideoFlow(sharedSelectedVideo!!)
+                // 3. Used CommunityViewModel for the live listener
+                val liveVideo by communityViewModel.getLiveVideoFlow(sharedSelectedVideo!!)
                     .collectAsState(initial = sharedSelectedVideo!!)
 
                 val isSaved = sanctuaryList.any { it.id == liveVideo.id }
@@ -135,7 +135,8 @@ fun MainAppScreen(
                             context.startActivity(webIntent)
                         }
                     },
-                    onLikeToggle = { video -> FirestoreRepository.toggleLike(video) }
+                    // 4. Used CommunityViewModel to handle the like logic
+                    onLikeToggle = { video -> communityViewModel.toggleLike(video) }
                 )
             } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
