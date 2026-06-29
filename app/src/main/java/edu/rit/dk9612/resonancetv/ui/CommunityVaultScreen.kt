@@ -37,7 +37,6 @@ fun CommunityVaultScreen(
             .fillMaxSize()
             .padding(top = 48.dp, start = 32.dp, end = 32.dp)
     ) {
-        // Headers matching the reference image
         Text(
             text = "VIBE CHECK: COMMUNITY",
             color = MaterialTheme.colorScheme.onBackground,
@@ -70,7 +69,6 @@ fun CommunityVaultScreen(
                 )
             }
         } else {
-            // Using a Vertical Grid for the side-by-side large cards
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
@@ -101,24 +99,19 @@ fun CommunityCard(
 ) {
     val context = LocalContext.current
 
-    // 1. The VISUAL Container: Looks like a card, but is NOT focusable.
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.surface, // Gives it the dark card background
+                color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(12.dp)
             )
-            .padding(bottom = 16.dp) // Padding for the bottom of the "card"
+            .padding(bottom = 16.dp)
     ) {
-
-        // 2. The INTERACTIVE Top Half: Focusable to open the video
         Card(
             onClick = onVideoClick,
             modifier = Modifier.fillMaxWidth(),
-            // Make the background transparent so the Column's background shows through
             colors = CardDefaults.colors(containerColor = Color.Transparent),
-            // Flatten the bottom corners so it seamlessly blends into the rest of the column!
             shape = CardDefaults.shape(shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp, bottomStart = 0.dp, bottomEnd = 0.dp)),
             scale = CardDefaults.scale(focusedScale = 1.02f)
         ) {
@@ -152,14 +145,12 @@ fun CommunityCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 3. The Action Buttons: Siblings to the Card so the D-pad can reach them!
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Like Button
             Button(
                 onClick = {
                     onLikeClick()
@@ -168,7 +159,12 @@ fun CommunityCard(
                 },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.colors(
-                    containerColor = if (video.isLikedByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = if (video.isLikedByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+
+                    contentColor = if (video.isLikedByMe) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
+
+                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                    focusedContentColor = Color.Black
                 )
             ) {
                 Icon(
@@ -177,11 +173,14 @@ fun CommunityCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
-                val likesText = if (video.likes >= 1000) "${String.format("%.1f", video.likes / 1000.0)}k" else "${video.likes}"
-                Text(likesText)
+                val countText = if (video.likes >= 1000) "${String.format("%.1f", video.likes / 1000.0)}k" else "${video.likes}"
+
+                Text(
+                    text = "$countText Likes",
+                    fontWeight = if (video.isLikedByMe) FontWeight.Bold else FontWeight.Normal
+                )
             }
 
-            // Save Button
             OutlinedButton(
                 onClick = {
                     onToggleSave()

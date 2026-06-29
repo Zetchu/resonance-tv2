@@ -22,8 +22,6 @@ class SanctuaryViewModel(application: Application) : AndroidViewModel(applicatio
     fun removeVideo(video: VideoItem) {
         repository.delete(toEntity(video))
     }
-
-    // Helper to map UI models to Database models
     private fun toEntity(video: VideoItem) = VideoEntity(
         id = video.id,
         title = video.title,

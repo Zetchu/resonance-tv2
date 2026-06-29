@@ -28,7 +28,6 @@ fun PlayerScreen(
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
-            // High-quality techno/electronic stream for your demo
             val mediaItem = MediaItem.fromUri("https://storage.googleapis.com/exoplayer-test-media-0/play.mp3")
             setMediaItem(mediaItem)
             prepare()

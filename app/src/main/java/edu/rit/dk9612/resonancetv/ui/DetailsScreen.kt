@@ -21,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
-import edu.rit.dk9612.resonancetv.data.repository.FirestoreRepository
 import android.widget.Toast
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.ThumbUp
@@ -35,7 +34,7 @@ fun DetailsScreen(
     isSaved: Boolean,
     onNavigateBack: () -> Unit,
     onToggleSave: (VideoItem) -> Unit,
-    onPlayClicked: () -> Unit, // 1. ADDED THIS PARAMETER
+    onPlayClicked: () -> Unit,
     onLikeToggle: (VideoItem) -> Unit
 ) {
     BackHandler(onBack = onNavigateBack)
@@ -125,9 +124,8 @@ fun DetailsScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                // Play Button
                 Button(
-                    onClick = onPlayClicked, // 2. REPLACED THE TODO WITH THIS ACTION
+                    onClick = onPlayClicked,
                     colors = ButtonDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.primary,
                         focusedContentColor = MaterialTheme.colorScheme.onBackground,
@@ -141,10 +139,8 @@ fun DetailsScreen(
                     Text("Watch Set", style = MaterialTheme.typography.titleMedium)
                 }
 
-                // Save to Sanctuary Button
                 OutlinedButton(
                     onClick = { onToggleSave(video)
-                        // 3. ADD THE TOAST FEEDBACK HERE
                         val msg = if (isSaved) "Removed from Sanctuary" else "Added to Sanctuary"
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                               },
@@ -170,7 +166,6 @@ fun DetailsScreen(
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
-                // 3. Like Button (Public Firebase Feed)
                 Button(
                     onClick = {
                         onLikeToggle(video)
@@ -178,12 +173,18 @@ fun DetailsScreen(
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                     },
                     colors = ButtonDefaults.colors(
-                        containerColor = if (video.isLikedByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                        containerColor = if (video.isLikedByMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+
+                        contentColor = if (video.isLikedByMe) Color.Black else MaterialTheme.colorScheme.onSurface,
+
+                        focusedContainerColor = MaterialTheme.colorScheme.primary,
+
+                        focusedContentColor = Color.Black
                     )
                 ) {
                     Icon(if (video.isLikedByMe) Icons.Filled.ThumbUp else Icons.Outlined.ThumbUp, null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("${video.likes} Likes") // Or just "Like" if you prefer
+                    Text("${video.likes} Likes")
                 }
             }
         }

@@ -26,19 +26,16 @@ import edu.rit.dk9612.resonancetv.data.model.VideoItem
 fun HomeScreen(
     onVideoClick: (VideoItem) -> Unit,
     onHeroClick: () -> Unit,
-    homeViewModel: HomeViewModel = viewModel() // Inject the ViewModel
+    homeViewModel: HomeViewModel = viewModel()
 ) {
-    // Observe the live data coming from the internet!
     val uiState by homeViewModel.uiState.collectAsState()
 
-    // React to the current state
     when (val state = uiState) {
 
         is HomeUiState.Loading -> {
-            // Show a loading spinner right in the middle of the screen
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Loading Sanctuary Data...",
+                    text = "Loading  Data...",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineMedium
                 )
@@ -46,7 +43,6 @@ fun HomeScreen(
         }
 
         is HomeUiState.Error -> {
-            // Show the error message if the internet drops or quota is hit
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     text = state.message,
@@ -57,7 +53,6 @@ fun HomeScreen(
         }
 
         is HomeUiState.Success -> {
-            // We have data! Grab the categories and show your normal UI
             val categories = state.categories
 
             LazyColumn(
@@ -90,8 +85,6 @@ fun HeroBanner(onHeroClick: () -> Unit) {
         scale = CardDefaults.scale(focusedScale = 1.02f)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-
-            // 1. The Sónar Barcelona Background Image
             AsyncImage(
                 model = "https://www.webarcelona.net/sites/default/files/styles/event_guide_new/public/events/sonar-barcelona-escenario-noche.webp?itok=CNrcuTk9",
                 contentDescription = "Sónar Festival Background",
@@ -99,19 +92,16 @@ fun HeroBanner(onHeroClick: () -> Unit) {
                 modifier = Modifier.fillMaxSize()
             )
 
-            // 2. A dark gradient overlay so the white text pops!
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.9f)),
-                            startY = 200f // Starts fading to black near the bottom
+                            startY = 200f
                         )
                     )
             )
-
-            // 3. Your Text Data
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -125,7 +115,7 @@ fun HeroBanner(onHeroClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Sónar Festival 2026\nMainstage Experience",
-                    color = Color.White, // Forced to white so it contrasts the dark gradient
+                    color = Color.White,
                     style = MaterialTheme.typography.headlineLarge
                 )
             }

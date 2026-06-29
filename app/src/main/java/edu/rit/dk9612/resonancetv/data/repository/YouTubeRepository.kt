@@ -43,4 +43,25 @@ open class YouTubeRepository {
             description = item.snippet.description
         )
     }
+
+    suspend fun searchByGenre(genre: String): List<VideoItem> = withContext(Dispatchers.IO) {
+        try {
+            // We append "DJ Set" to ensure we get music results
+            val response = api.searchVideos(query = "$genre DJ Set")
+            response.items.mapNotNull { item ->
+                val validId = item.id.videoId ?: return@mapNotNull null
+                VideoItem(
+                    id = validId,
+                    title = item.snippet.title,
+                    subtitle = item.snippet.channelTitle,
+                    duration = "Live Set",
+                    thumbnailUrl = item.snippet.thumbnails.high.url,
+                    description = item.snippet.description
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
 }

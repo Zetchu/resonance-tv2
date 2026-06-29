@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -26,18 +27,13 @@ import edu.rit.dk9612.resonancetv.data.model.VideoItem
 @Composable
 fun MainAppScreen(
     sanctuaryViewModel: SanctuaryViewModel = viewModel(),
-    communityViewModel: CommunityViewModel = viewModel() // 1. Injected the new ViewModel!
+    communityViewModel: CommunityViewModel = viewModel()
 ) {
     val context = LocalContext.current
-
-    // Initialize the Navigation Controller
     val navController = rememberNavController()
-
-    // State to hold the complex VideoItem while we navigate using its ID
     var sharedSelectedVideo by remember { mutableStateOf<VideoItem?>(null) }
     val heroMockVideo = VideoItem("hero_id", "Sónar 2026", "Live", "LIVE", "", "", 5)
 
-    // Keep Sanctuary list observer at the top so all screens can access it
     val savedVideosEntities by sanctuaryViewModel.savedVideos.observeAsState(emptyList())
     val sanctuaryList = savedVideosEntities.map { entity ->
         VideoItem(
@@ -49,16 +45,13 @@ fun MainAppScreen(
         )
     }
 
-    // The NavHost handles all screen routing
     NavHost(navController = navController, startDestination = "home") {
 
-        // --- MAIN TABS (Wrapped in our Drawer layout) ---
         composable("home") {
             MainLayoutWithDrawer(currentRoute = "home", navController = navController) {
                 HomeScreen(
                     onVideoClick = { video ->
                         sharedSelectedVideo = video
-                        // Pass the ID as route data to satisfy navigation requirements!
                         navController.navigate("details/${video.id}")
                     },
                     onHeroClick = {
@@ -101,17 +94,22 @@ fun MainAppScreen(
                 )
             }
         }
+        composable("discover") {
+            MainLayoutWithDrawer(currentRoute = "discover", navController = navController) {
+                DiscoverScreen(
+                    onVideoClick = { video ->
+                        sharedSelectedVideo = video
+                        navController.navigate("details/${video.id}")
+                    }
+                )
+            }
+        }
 
-        // --- SUB SCREENS (No Drawer) ---
-
-        // DETAILS DESTINATION - Grabs the passed videoId argument
         composable("details/{videoId}") { backStackEntry ->
             val videoId = backStackEntry.arguments?.getString("videoId")
 
-            // Ensure we have data for the ID that was passed
             if (sharedSelectedVideo != null && sharedSelectedVideo?.id == videoId) {
 
-                // 3. Used CommunityViewModel for the live listener
                 val liveVideo by communityViewModel.getLiveVideoFlow(sharedSelectedVideo!!)
                     .collectAsState(initial = sharedSelectedVideo!!)
 
@@ -120,7 +118,7 @@ fun MainAppScreen(
                 DetailsScreen(
                     video = liveVideo,
                     isSaved = isSaved,
-                    onNavigateBack = { navController.popBackStack() }, // True Back Navigation!
+                    onNavigateBack = { navController.popBackStack() },
                     onToggleSave = { video ->
                         if (isSaved) sanctuaryViewModel.removeVideo(video)
                         else sanctuaryViewModel.addVideo(video)
@@ -135,7 +133,6 @@ fun MainAppScreen(
                             context.startActivity(webIntent)
                         }
                     },
-                    // 4. Used CommunityViewModel to handle the like logic
                     onLikeToggle = { video -> communityViewModel.toggleLike(video) }
                 )
             } else {
@@ -156,13 +153,18 @@ fun MainAppScreen(
     }
 }
 
-// Helper wrapper to enforce the Drawer UI on main tabs
 @Composable
 fun MainLayoutWithDrawer(
     currentRoute: String,
     navController: NavController,
     content: @Composable () -> Unit
 ) {
+    val navItemColors = NavigationDrawerItemDefaults.colors(
+        selectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+        selectedContentColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    )
+
     NavigationDrawer(
         drawerContent = {
             Column(
@@ -180,6 +182,7 @@ fun MainLayoutWithDrawer(
                             popUpTo("home") { inclusive = false }
                         }
                     },
+                    colors = navItemColors,
                     leadingContent = { Icon(Icons.Default.Home, contentDescription = "Home") }
                 ) { Text("Home") }
 
@@ -193,6 +196,7 @@ fun MainLayoutWithDrawer(
                             popUpTo("home") { inclusive = false }
                         }
                     },
+                    colors = navItemColors,
                     leadingContent = { Icon(Icons.Default.Favorite, contentDescription = "Library") }
                 ) { Text("Sanctuary") }
 
@@ -206,8 +210,23 @@ fun MainLayoutWithDrawer(
                             popUpTo("home") { inclusive = false }
                         }
                     },
+                    colors = navItemColors,
                     leadingContent = { Icon(Icons.Default.Share, contentDescription = "Community") }
                 ) { Text("Community") }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                NavigationDrawerItem(
+                    selected = currentRoute == "discover",
+                    onClick = {
+                        navController.navigate("discover") {
+                            launchSingleTop = true
+                            popUpTo("home") { inclusive = false }
+                        }
+                    },
+                    colors = navItemColors,
+                    leadingContent = { Icon(Icons.Default.Search, contentDescription = "Discover") }
+                ) { Text("Discover") }
             }
         }
     ) {

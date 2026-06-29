@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-// 1. Define the possible states of our Home Screen
 sealed interface HomeUiState {
     object Loading : HomeUiState
     data class Success(val categories: List<VideoCategory>) : HomeUiState
@@ -18,10 +17,6 @@ sealed interface HomeUiState {
 
 class HomeViewModel(  private val repository: YouTubeRepository = YouTubeRepository()) : ViewModel() {
 
-    // 2. Grab our clean repository
-
-
-    // 3. Set up the StateFlow that the UI will observe
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -31,10 +26,9 @@ class HomeViewModel(  private val repository: YouTubeRepository = YouTubeReposit
 
     fun fetchHomeContent() {
         viewModelScope.launch {
-            _uiState.value = HomeUiState.Loading // Tell UI to show a spinner
+            _uiState.value = HomeUiState.Loading
 
             try {
-                // Ask the repository for the data
                 val categories = repository.getHomeCategories()
 
                 if (categories.isNotEmpty()) {
