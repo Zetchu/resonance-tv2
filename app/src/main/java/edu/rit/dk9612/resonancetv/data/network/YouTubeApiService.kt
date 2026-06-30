@@ -1,6 +1,7 @@
 package edu.rit.dk9612.resonancetv.data.network
 
 
+import edu.rit.dk9612.resonancetv.data.model.SearchResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

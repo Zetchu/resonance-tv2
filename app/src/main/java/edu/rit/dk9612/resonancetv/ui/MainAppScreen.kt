@@ -82,7 +82,6 @@ fun MainAppScreen(
 
         composable("community") {
             MainLayoutWithDrawer(currentRoute = "community", navController = navController) {
-                // 2. Used CommunityViewModel instead of FirestoreRepository
                 val communityVideos by communityViewModel.communityVideosFlow.collectAsState(initial = emptyList())
 
                 CommunityVaultScreen(

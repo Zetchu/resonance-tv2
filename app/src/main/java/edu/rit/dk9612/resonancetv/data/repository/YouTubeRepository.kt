@@ -3,7 +3,7 @@ package edu.rit.dk9612.resonancetv.data.repository
 import edu.rit.dk9612.resonancetv.data.model.VideoCategory
 import edu.rit.dk9612.resonancetv.data.model.VideoItem
 import edu.rit.dk9612.resonancetv.data.network.RetrofitInstance
-import edu.rit.dk9612.resonancetv.data.network.YouTubeItem // <--- IMPORT THIS
+import edu.rit.dk9612.resonancetv.data.model.YouTubeItem // <--- IMPORT THIS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

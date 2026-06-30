@@ -1,7 +1,7 @@
 package edu.rit.dk9612.resonancetv
 
 import edu.rit.dk9612.resonancetv.data.model.VideoItem
-import edu.rit.dk9612.resonancetv.data.network.SharedVideo
+import edu.rit.dk9612.resonancetv.data.model.SharedVideo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

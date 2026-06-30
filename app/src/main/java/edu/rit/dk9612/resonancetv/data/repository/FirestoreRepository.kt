@@ -5,7 +5,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import edu.rit.dk9612.resonancetv.data.model.VideoItem
-import edu.rit.dk9612.resonancetv.data.network.SharedVideo
+import edu.rit.dk9612.resonancetv.data.model.SharedVideo
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

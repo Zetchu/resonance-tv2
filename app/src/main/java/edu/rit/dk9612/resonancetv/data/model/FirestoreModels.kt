@@ -1,4 +1,4 @@
-package edu.rit.dk9612.resonancetv.data.network
+package edu.rit.dk9612.resonancetv.data.model
 
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
