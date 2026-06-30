@@ -9,7 +9,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {
     private const val BASE_URL = "https://www.googleapis.com/youtube/v3/"
 
-    // 1. The Interceptor: Automatically adds ?key=YOUR_API_KEY to every request
     private val apiKeyInterceptor = Interceptor { chain ->
         val originalRequest = chain.request()
         val originalUrl = originalRequest.url
@@ -25,16 +24,14 @@ object RetrofitInstance {
         chain.proceed(newRequest)
     }
 
-    // 2. Attach the Interceptor to the OkHttpClient
     private val client = OkHttpClient.Builder()
         .addInterceptor(apiKeyInterceptor)
         .build()
 
-    // 3. Build Retrofit using our custom client
     val api: YouTubeApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(client) // <-- Make sure this is here!
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(YouTubeApiService::class.java)

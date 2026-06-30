@@ -1,6 +1,5 @@
 package edu.rit.dk9612.resonancetv.data.network
 
-// This represents the outermost JSON object
 data class SearchResponse(
     val items: List<YouTubeItem> = emptyList()
 )
@@ -11,7 +10,7 @@ data class YouTubeItem(
 )
 
 data class VideoId(
-    val videoId: String? = null // Sometimes YouTube returns playlists, so this can be null
+    val videoId: String? = null
 )
 
 data class Snippet(

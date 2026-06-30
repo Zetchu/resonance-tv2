@@ -21,8 +21,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.tv.material3.*
-import edu.rit.dk9612.resonancetv.SanctuaryViewModel
+import edu.rit.dk9612.resonancetv.ui.viewmodels.SanctuaryViewModel
 import edu.rit.dk9612.resonancetv.data.model.VideoItem
+import edu.rit.dk9612.resonancetv.ui.screens.CommunityVaultScreen
+import edu.rit.dk9612.resonancetv.ui.screens.DetailsScreen
+import edu.rit.dk9612.resonancetv.ui.screens.DiscoverScreen
+import edu.rit.dk9612.resonancetv.ui.screens.HomeScreen
+import edu.rit.dk9612.resonancetv.ui.screens.LibraryScreen
+import edu.rit.dk9612.resonancetv.ui.screens.PlayerScreen
 
 @Composable
 fun MainAppScreen(
@@ -125,11 +131,15 @@ fun MainAppScreen(
                     },
                     onPlayClicked = {
                         try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + liveVideo.id))
+                            val intent =
+                                Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + liveVideo.id))
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             context.startActivity(intent)
                         } catch (e: Exception) {
-                            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + liveVideo.id))
+                            val webIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://www.youtube.com/watch?v=" + liveVideo.id)
+                            )
                             context.startActivity(webIntent)
                         }
                     },

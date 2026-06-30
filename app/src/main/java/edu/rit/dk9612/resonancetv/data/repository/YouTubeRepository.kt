@@ -29,9 +29,7 @@ open class YouTubeRepository {
         }
     }
 
-    // UPDATED: We now pass the strictly typed YouTubeItem instead of 'Any'
     private fun mapToVideoItem(item: YouTubeItem): VideoItem? {
-        // Safe call: If videoId is null, we return null and mapNotNull skips it!
         val validId = item.id.videoId ?: return null
 
         return VideoItem(
@@ -46,7 +44,6 @@ open class YouTubeRepository {
 
     suspend fun searchByGenre(genre: String): List<VideoItem> = withContext(Dispatchers.IO) {
         try {
-            // We append "DJ Set" to ensure we get music results
             val response = api.searchVideos(query = "$genre DJ Set")
             response.items.mapNotNull { item ->
                 val validId = item.id.videoId ?: return@mapNotNull null

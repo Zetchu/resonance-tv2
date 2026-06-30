@@ -2,8 +2,8 @@ package edu.rit.dk9612.resonancetv
 
 import edu.rit.dk9612.resonancetv.data.model.VideoCategory
 import edu.rit.dk9612.resonancetv.data.repository.YouTubeRepository
-import edu.rit.dk9612.resonancetv.ui.HomeUiState
-import edu.rit.dk9612.resonancetv.ui.HomeViewModel
+import edu.rit.dk9612.resonancetv.ui.viewmodels.HomeUiState
+import edu.rit.dk9612.resonancetv.ui.viewmodels.HomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*

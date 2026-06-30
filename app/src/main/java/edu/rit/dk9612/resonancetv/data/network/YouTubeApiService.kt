@@ -8,7 +8,7 @@ interface YouTubeApiService {
     @GET("search")
     suspend fun searchVideos(
         @Query("part") part: String = "snippet",
-        @Query("q") query: String, // e.g., "Boiler room techno"
+        @Query("q") query: String,
         @Query("type") type: String = "video",
         @Query("maxResults") maxResults: Int = 10,
     ): SearchResponse
